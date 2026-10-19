@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Latihan Mengetik 10 Jari</title>
+<style>
+:root{
+  --bg:#f5f6fb;--surface:#fff;--ink:#1b1f3b;--muted:#6b7090;--line:#e2e5f1;
+  --accent:#5b4bff;--accent-ink:#fff;--good:#0f9d68;--bad:#e5484d;--cur:#ffe58a;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0e0f1f;--surface:#171932;--ink:#eceefe;--muted:#9a9fc4;--line:#2a2d4f;
+  --accent:#8b80ff;--accent-ink:#0e0f1f;--good:#3ddc97;--bad:#ff6b70;--cur:#4a4300}
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;display:flex;justify-content:center;padding:20px 16px 48px}
+main{width:100%;max-width:720px}
+header{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:20px}
+h1{font-size:1.1rem;margin:0;font-weight:700;letter-spacing:-.01em}
+#best{color:var(--muted);font-size:.85rem}
+#levels{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin-bottom:24px}
+#levels button{aspect-ratio:1;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;font-weight:600;font-size:.9rem;cursor:pointer;padding:0}
+#levels button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+#levels button.done{border-color:var(--good);color:var(--good)}
+#levels button:disabled{opacity:.35;cursor:not-allowed}
+.info{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:12px}
+.info h2{margin:0;font-size:1.6rem;letter-spacing:-.02em;line-height:1.1}
+.info p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+.stats{display:flex;gap:16px;text-align:right}
+.stats b{display:block;font-size:1.5rem;font-variant-numeric:tabular-nums;line-height:1}
+.stats span{font-size:.75rem;color:var(--muted)}
+#box{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px 20px;cursor:text;min-height:150px}
+#box:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+#teks{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:1.35rem;line-height:2;color:var(--muted);user-select:none}
+.w{display:inline-block;white-space:nowrap}
+.ok{color:var(--good)}
+.no{color:var(--bad);text-decoration:underline}
+.cur{background:var(--cur);border-radius:3px;color:var(--ink)}
+.sp{display:inline-block;width:1ch;position:relative}
+.sp.no{background:color-mix(in srgb,var(--bad) 25%,transparent);text-decoration:none}
+#in{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;resize:none;cursor:text}
+#hint{margin:12px 0 0;color:var(--muted);font-size:.85rem;text-align:center}
+#bar{height:6px;background:var(--line);border-radius:6px;margin-top:16px;overflow:hidden}
+#bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .15s}
+#hasil{display:none;margin-top:20px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px 20px;text-align:center}
+#hasil.show{display:block}
+#hasil h3{margin:0 0 6px;font-size:1.3rem}
+#hasil p{margin:0 0 16px;color:var(--muted)}
+.btn{border:0;border-radius:10px;padding:12px 22px;font-size:1rem;font-weight:600;cursor:pointer;background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.top{margin-top:16px;display:flex;justify-content:center}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+@media (max-width:520px){
+  #teks{font-size:1.1rem}
+  .info{flex-direction:column;align-items:flex-start}
+  .stats{text-align:left}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Latihan Mengetik 10 Jari</h1>
+    <span id="best"></span>
+  </header>
+
+  <div id="levels" aria-label="Pilih level"></div>
+
+  <div class="info">
+    <div>
+      <h2 id="jdl"></h2>
+      <p id="target"></p>
+    </div>
+    <div class="stats">
+      <div><b id="wpm">0</b><span>WPM</span></div>
+      <div><b id="akr">100%</b><span>Akurasi</span></div>
+      <div><b id="wkt">0.0</b><span>Detik</span></div>
+    </div>
+  </div>
+
+  <div id="box">
+    <div id="teks"></div>
+    <textarea id="in" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Ketik di sini"></textarea>
+  </div>
+  <div id="bar"><i></i></div>
+  <p id="hint">Klik kotak di atas, lalu mulai mengetik. Waktu berjalan saat huruf pertama.</p>
+
+  <div id="hasil">
+    <h3 id="hJudul"></h3>
+    <p id="hIsi"></p>
+    <div class="row">
+      <button class="btn" id="lanjut">Lanjut</button>
+      <button class="btn ghost" id="ulang">Ulangi</button>
+    </div>
+  </div>
+  <div class="top"><button class="btn ghost" id="reset">Reset progres</button></div>
+</main>
+
+<script>
+const LEVELS = [
+  {n:"Kalimat pemanasan", t:10, s:["Pagi ini saya bangun lebih awal supaya bisa sarapan dengan tenang.","Setiap hari saya berlatih mengetik sedikit demi sedikit agar jari terbiasa."]},
+  {n:"Kegiatan sehari-hari", t:15, s:["Setelah pulang dari kampus, saya biasanya langsung makan siang lalu mengerjakan tugas.","Ibu menyiapkan teh hangat dan kue sederhana untuk keluarga yang sedang berkumpul di rumah."]},
+  {n:"Kehidupan kampus", t:20, s:["Mahasiswa baru biasanya merasa bingung pada minggu pertama kuliah, tetapi lama kelamaan mereka mulai terbiasa.","Dosen meminta seluruh kelompok mengumpulkan laporan praktikum sebelum hari Jumat sore melalui email kampus."]},
+  {n:"Bercerita", t:25, s:["Kemarin sore hujan turun deras sekali, jadi kami memutuskan untuk berteduh di warung kopi dekat kampus sambil membicarakan rencana liburan.","Perjalanan menuju kota itu memakan waktu hampir empat jam, namun pemandangan sawah dan pegunungan di sepanjang jalan membuat semuanya terasa menyenangkan."]},
+  {n:"Teknologi", t:30, s:["Perkembangan teknologi informasi membuat hampir semua pekerjaan kini dapat dilakukan secara daring, mulai dari rapat, belajar, sampai berbelanja kebutuhan sehari-hari.","Sebuah website yang baik harus mudah dibuka di ponsel, memiliki tampilan sederhana, dan memuat informasi yang jelas agar pengunjung tidak merasa kebingungan."]},
+  {n:"Belajar dan disiplin", t:35, s:["Orang yang ingin mahir mengetik sepuluh jari perlu berlatih secara rutin, menjaga posisi tangan tetap benar, dan tidak terlalu sering melihat ke arah papan ketik.","Disiplin belajar tidak berarti harus belajar berjam-jam setiap hari, tetapi cukup meluangkan waktu secara konsisten sehingga ilmu yang didapat benar-benar melekat."]},
+  {n:"Lingkungan dan masyarakat", t:40, s:["Menjaga kebersihan lingkungan adalah tanggung jawab bersama, karena sampah yang dibuang sembarangan dapat menyumbat saluran air dan menyebabkan banjir saat musim hujan tiba.","Gotong royong merupakan budaya yang sudah lama hidup di tengah masyarakat kita, dan semangat saling membantu itu patut terus dijaga dari generasi ke generasi."]},
+  {n:"Pengetahuan umum", t:45, s:["Indonesia adalah negara kepulauan terbesar di dunia dengan ribuan pulau yang membentang dari Sabang sampai Merauke, serta memiliki beragam suku, bahasa, dan budaya yang kaya.","Bahasa pemrograman adalah alat untuk menyampaikan perintah kepada komputer, sehingga seorang programmer perlu menulis kode dengan teliti agar program berjalan sesuai harapan."]},
+  {n:"Paragraf pendek", t:50, s:["Menulis adalah keterampilan yang akan terus dibutuhkan sepanjang hidup. Dengan mengetik lebih cepat, kita dapat menuangkan ide ke dalam tulisan tanpa kehilangan arah pikiran, sehingga hasil kerja menjadi lebih baik.","Waktu adalah sumber daya yang tidak bisa dibeli kembali. Karena itu, belajar mengatur waktu dengan bijak sejak dini akan membantu kita menyelesaikan tugas tanpa harus terburu-buru di menit terakhir."]},
+  {n:"Tantangan akhir", t:55, s:["Kesuksesan jarang datang secara tiba-tiba. Biasanya ia dibangun dari kebiasaan kecil yang dilakukan berulang kali, dari kesabaran menghadapi kegagalan, dan dari keyakinan bahwa usaha yang tulus pasti membuahkan hasil pada waktunya.","Selamat, kamu sudah sampai di level terakhir. Teruslah berlatih dengan tenang dan fokus, karena kecepatan yang sejati lahir dari ketepatan, dan ketepatan lahir dari latihan yang dilakukan dengan sepenuh hati setiap hari."]}
+];
+const MIN_AKURASI = 90;
+const $ = id => document.getElementById(id);
+const el = {teks:$("teks"), in:$("in"), wpm:$("wpm"), akr:$("akr"), wkt:$("wkt"), bar:document.querySelector("#bar i"),
+  hasil:$("hasil"), hJudul:$("hJudul"), hIsi:$("hIsi"), lanjut:$("lanjut"), levels:$("levels"), best:$("best")};
+
+let save = {unlocked:1, best:0};
+try { const s = JSON.parse(localStorage.getItem("ketik")); if (s) save = s; } catch(e){}
+function simpan(){ try { localStorage.setItem("ketik", JSON.stringify(save)); } catch(e){} }
+
+let level = Math.min(save.unlocked, LEVELS.length) - 1;
+let teks = "", chars = [], mulai = null, selesai = false, timer = null, lulus = false;
+
+function hitung(){
+  const v = el.in.value;
+  let benar = 0;
+  for (let i = 0; i < v.length; i++) if (v[i] === teks[i]) benar++;
+  const menit = mulai ? Math.max((Date.now() - mulai) / 60000, 1/600) : 0;
+  return {
+    benar, panjang: v.length,
+    wpm: mulai ? Math.round(benar / 5 / menit) : 0,
+    akr: v.length ? Math.round(benar / v.length * 100) : 100,
+    detik: mulai ? (Date.now() - mulai) / 1000 : 0
+  };
+}
+
+function tampil(){
+  const h = hitung();
+  el.wpm.textContent = h.wpm;
+  el.akr.textContent = h.akr + "%";
+  el.wkt.textContent = h.detik.toFixed(1);
+  el.bar.style.width = Math.min(h.panjang / teks.length * 100, 100) + "%";
+  return h;
+}
+
+function gambarLevel(){
+  el.levels.innerHTML = "";
+  LEVELS.forEach((l, i) => {
+    const b = document.createElement("button");
+    b.textContent = i + 1;
+    b.title = "Level " + (i + 1) + ": " + l.n;
+    b.disabled = i + 1 > save.unlocked;
+    b.className = i === level ? "on" : (i + 1 < save.unlocked ? "done" : "");
+    b.onclick = () => { level = i; mulaiLevel(); };
+    el.levels.appendChild(b);
+  });
+  el.best.textContent = save.best ? "Rekor: " + save.best + " WPM" : "";
+}
+
+function mulaiLevel(){
+  clearInterval(timer);
+  const L = LEVELS[level];
+  teks = L.s[Math.floor(Math.random() * L.s.length)].toLowerCase();
+  mulai = null; selesai = false;
+  el.in.value = ""; el.in.disabled = false;
+  el.hasil.classList.remove("show");
+  $("jdl").textContent = "Level " + (level + 1) + ": " + L.n;
+  $("target").textContent = "Target " + L.t + " WPM dengan akurasi minimal " + MIN_AKURASI + "%";
+  el.teks.innerHTML = "";
+  chars = [];
+  teks.split(" ").forEach((kata, wi, arr) => {
+    const w = document.createElement("span"); w.className = "w";
+    (kata + (wi < arr.length - 1 ? " " : "")).split("").forEach(c => {
+      const s = document.createElement("span"); s.textContent = c;
+      w.appendChild(s); chars.push(s);
+    });
+    el.teks.appendChild(w);
+  });
+  warnai(); tampil(); gambarLevel();
+  el.in.focus();
+}
+
+function warnai(){
+  const v = el.in.value;
+  chars.forEach((s, i) => {
+    s.className = (i < v.length ? (v[i] === teks[i] ? "ok" : "no") : (i === v.length ? "cur" : "")) + (teks[i] === " " ? " sp" : "");
+  });
+}
+
+function akhir(){
+  selesai = true; clearInterval(timer); el.in.disabled = true;
+  const h = tampil(), L = LEVELS[level];
+  lulus = h.wpm >= L.t && h.akr >= MIN_AKURASI;
+  if (h.akr >= MIN_AKURASI && h.wpm > save.best) save.best = h.wpm;
+  const terakhir = level === LEVELS.length - 1;
+  if (lulus) {
+    if (!terakhir && save.unlocked < level + 2) save.unlocked = level + 2;
+    el.hJudul.textContent = terakhir ? "Kamu menamatkan semua level!" : "Level " + (level + 1) + " selesai!";
+    el.hIsi.textContent = h.wpm + " WPM dengan akurasi " + h.akr + "%.";
+    el.lanjut.textContent = terakhir ? "Main dari level 1" : "Lanjut ke level " + (level + 2);
+  } else {
+    el.hJudul.textContent = "Belum lulus";
+    el.hIsi.textContent = h.wpm + " WPM, akurasi " + h.akr + "%. " +
+      (h.akr < MIN_AKURASI ? "Perlambat sedikit dan fokus pada ketepatan." : "Akurasi sudah bagus, tambah kecepatannya.");
+    el.lanjut.textContent = "Coba lagi";
+  }
+  simpan(); gambarLevel();
+  el.hasil.classList.add("show");
+  el.lanjut.focus();
+}
+
+el.in.addEventListener("input", () => {
+  if (selesai) return;
+  if (!mulai) { mulai = Date.now(); timer = setInterval(tampil, 200); }
+  if (el.in.value.length > teks.length) el.in.value = el.in.value.slice(0, teks.length);
+  warnai(); tampil();
+  if (el.in.value.length >= teks.length) akhir();
+});
+
+el.lanjut.onclick = () => {
+  if (lulus) level = level === LEVELS.length - 1 ? 0 : level + 1;
+  mulaiLevel();
+};
+$("ulang").onclick = mulaiLevel;
+$("reset").onclick = () => {
+  if (!confirm("Hapus semua progres dan mulai dari level 1?")) return;
+  save = {unlocked:1, best:0}; simpan(); level = 0; mulaiLevel();
+};
+$("box").addEventListener("click", () => el.in.focus());
+document.addEventListener("keydown", e => { if (e.key === "Tab") { e.preventDefault(); mulaiLevel(); } });
+
+mulaiLevel();
+</script>
+</body>
+</html>
